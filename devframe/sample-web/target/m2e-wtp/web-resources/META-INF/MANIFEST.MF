@@ -1,0 +1,74 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: 19
+Class-Path: sample-biz-0.0.1-SNAPSHOT.jar cmmn-0.0.1-SNAPSHOT.jar tiles-
+ jsp-3.0.8.jar tiles-servlet-3.0.8.jar tiles-request-servlet-1.0.7.jar t
+ iles-template-3.0.8.jar tiles-api-3.0.8.jar tiles-autotag-core-runtime-
+ 1.2.jar slf4j-api-1.7.6.jar tiles-request-jsp-1.0.7.jar tiles-request-a
+ pi-1.0.7.jar tiles-el-3.0.8.jar tiles-core-3.0.8.jar commons-digester-2
+ .0.jar jcl-over-slf4j-1.7.6.jar sockjs-client-1.5.1.jar stomp-websocket
+ -2.3.4.jar taglibs-standard-impl-1.2.5.jar javax.inject-1.jar logback-c
+ ore-1.2.11.jar logback-classic-1.2.11.jar spring-core-5.3.17.jar spring
+ -jcl-5.3.17.jar spring-webmvc-5.3.17.jar spring-aop-5.3.17.jar spring-b
+ eans-5.3.17.jar spring-context-5.3.17.jar spring-expression-5.3.17.jar 
+ spring-web-5.3.17.jar spring-messaging-5.3.17.jar spring-websocket-5.3.
+ 17.jar spring-aspects-5.3.17.jar aspectjweaver-1.9.7.jar spring-oxm-5.3
+ .17.jar jjwt-0.9.1.jar spring-security-web-5.6.2.jar spring-security-co
+ re-5.6.2.jar spring-security-config-5.6.2.jar spring-security-taglibs-5
+ .6.2.jar spring-security-acl-5.6.2.jar spring-security-crypto-5.6.2.jar
+  spring-security-oauth2-2.5.1.RELEASE.jar commons-codec-1.14.jar egovfr
+ amework.rte.ptl.mvc-3.10.0.jar commons-validator-1.6.jar javax.annotati
+ on-api-1.3.2.jar egovframework.rte.fdl.security-3.10.0.jar spring-jdbc-
+ 5.3.17.jar egovframework.rte.fdl.cmmn-3.10.0.jar spring-context-support
+ -5.3.17.jar spring-tx-5.3.17.jar aspectjrt-1.9.5.jar commons-lang3-3.9.
+ jar egovframework.rte.fdl.idgnr-3.10.0.jar egovframework.rte.fdl.crypto
+ -3.10.0.jar egovframework.rte.fdl.property-3.10.0.jar jasypt-1.9.3.jar 
+ commons-io-2.6.jar egovframework.rte.fdl.string-3.10.0.jar egovframewor
+ k.rte.psl.dataaccess-3.10.0.jar spring-orm-5.3.17.jar javaee-api-7.0.ja
+ r javax.mail-1.5.0.jar activation-1.1.jar ibatis-sqlmap-2.3.4.726.jar c
+ ommons-collections-3.2.2.jar egovframework.rte.itl.integration-3.10.0.j
+ ar egovframework.rte.itl.webservice-3.10.0.jar jaxws-api-2.3.1.jar java
+ x.xml.soap-api-1.4.0.jar cxf-rt-frontend-jaxws-3.3.4.jar xml-resolver-1
+ .2.jar asm-7.1.jar cxf-core-3.3.4.jar xmlschema-core-2.2.4.jar cxf-rt-b
+ indings-soap-3.3.4.jar cxf-rt-wsdl-3.3.4.jar wsdl4j-1.6.3.jar cxf-rt-da
+ tabinding-jaxb-3.3.4.jar cxf-rt-bindings-xml-3.3.4.jar cxf-rt-frontend-
+ simple-3.3.4.jar cxf-rt-ws-addr-3.3.4.jar cxf-rt-ws-policy-3.3.4.jar ne
+ ethi-3.1.1.jar javax.activation-1.2.0.jar geronimo-ws-metadata_2.0_spec
+ -1.1.3.jar saaj-impl-1.4.0-b03.jar mimepull-1.9.7.jar jacorb-omgapi-3.7
+ .jar geronimo-jta_1.1_spec-1.1.1.jar jboss-rmi-api_1.0_spec-1.0.6.Final
+ .jar cxf-rt-transports-http-jetty-3.3.4.jar cxf-rt-transports-http-3.3.
+ 4.jar jetty-server-9.4.21.v20190926.jar jetty-util-9.4.21.v20190926.jar
+  jetty-io-9.4.21.v20190926.jar jetty-security-9.4.21.v20190926.jar jett
+ y-continuation-9.4.21.v20190926.jar jetty-http-9.4.21.v20190926.jar ego
+ vframework.rte.fdl.logging-3.10.0.jar commons-dbcp2-2.9.0.jar commons-l
+ ogging-1.2.jar commons-pool2-2.11.1.jar commons-fileupload-1.4.jar comm
+ ons-beanutils-1.9.4.jar mybatis-3.5.9.jar mybatis-spring-2.0.7.jar myba
+ tis-ehcache-1.2.2.jar ehcache-2.10.9.2.jar h2-2.1.210.jar transactions-
+ jdbc-5.0.9.jar transactions-jta-5.0.9.jar transactions-api-5.0.9.jar tr
+ ansactions-5.0.9.jar atomikos-util-5.0.9.jar mysql-connector-java-8.0.2
+ 8.jar protobuf-java-3.11.4.jar hibernate-core-5.6.7.Final.jar jboss-log
+ ging-3.4.3.Final.jar javax.persistence-api-2.2.jar byte-buddy-1.12.8.ja
+ r antlr-2.7.7.jar jboss-transaction-api_1.2_spec-1.1.1.Final.jar jandex
+ -2.4.2.Final.jar classmate-1.5.1.jar javax.activation-api-1.2.0.jar hib
+ ernate-commons-annotations-5.1.2.Final.jar jaxb-api-2.3.1.jar jaxb-runt
+ ime-2.3.1.jar txw2-2.3.1.jar istack-commons-runtime-3.0.7.jar stax-ex-1
+ .8.jar FastInfoset-1.2.15.jar hibernate-validator-6.2.3.Final.jar jakar
+ ta.validation-api-2.0.2.jar javax.el-api-3.0.0.jar gson-2.9.0.jar jacks
+ on-databind-2.12.5.jar jackson-annotations-2.12.5.jar jackson-core-2.12
+ .5.jar jackson-dataformat-xml-2.12.5.jar jackson-module-jaxb-annotation
+ s-2.12.5.jar jakarta.xml.bind-api-2.3.2.jar jakarta.activation-api-1.2.
+ 1.jar stax2-api-4.2.1.jar woodstox-core-6.2.4.jar jackson-module-kotlin
+ -2.12.5.jar kotlin-reflect-1.4.21.jar kotlin-stdlib-1.4.21.jar kotlin-s
+ tdlib-common-1.4.21.jar annotations-13.0.jar janino-3.1.6.jar commons-c
+ ompiler-3.1.6.jar jsr305-3.0.2.jar lucy-xss-servlet-2.0.1.jar lucy-xss-
+ 1.6.3.jar poi-5.2.2.jar commons-collections4-4.4.jar commons-math3-3.6.
+ 1.jar SparseBitSet-1.2.jar log4j-api-2.17.2.jar poi-ooxml-5.2.2.jar poi
+ -ooxml-lite-5.2.2.jar commons-compress-1.21.jar curvesapi-1.07.jar xmlb
+ eans-5.0.3.jar icu4j-70.1.jar uiadapter17-spring-core-1.0.0-20180124.00
+ 0818-1.jar nexacro17-xapi-1.0.0-20200609.072901-2.jar junit-4.13.1.jar 
+ hamcrest-core-1.3.jar uiadapter17-spring-dataaccess-1.0.0-20180124.0008
+ 28-1.jar uiadapter17-spring-excel-1.0.0-20180124.000836-1.jar nexacro17
+ -xeni-1.0.0-20190920.014831-1.jar dom4j-1.6.1.jar xml-apis-1.0.b2.jar p
+ oi-ooxml-schemas-3.10-FINAL.jar poi-scratchpad-3.10-FINAL.jar stax-api-
+ 1.0.1.jar jsoup-1.14.3.jar
+Created-By: Maven Integration for Eclipse
+

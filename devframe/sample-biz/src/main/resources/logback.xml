@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration status="DEBUG" scan="true" scanPeriod="15 seconds">
+
+	<!-- FrameWork System Logback Configuration -->
+	<include resource="logback-default.xml" />
+
+</configuration>

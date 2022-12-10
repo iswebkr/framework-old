@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false"
+    monitoring="autodetect" dynamicConfig="true">
+
+    <!-- 임시저장경로 -->
+    <diskStore path="java.io.tmpdir" />
+
+    <!--
+    Cache에 저장할 레퍼런스의 최대값을 100000으로 지정,
+    maxDepthExceededBehavior = "continue" : 초과 된 최대 깊이에 대해 경고하지만 크기가 조정 된 요소를 계속 탐색
+    maxDepthExceededBehavior = "abort" : 순회를 중지하고 부분적으로 계산 된 크기를 즉시 반환
+    -->
+    <sizeOfPolicy maxDepth="100000" maxDepthExceededBehavior="continue" />
+
+    <!--
+    name : 코드에서 사용할 캐시 name : 필수
+    maxEntriesLocalHeap : 메모리에 생성될 최대 캐시 갯수 : 0
+    maxEntriesLocalDisk : 디스크에 생성될 최대 캐시 갯수 : 0 (maxEntriesLocalHeap 보다 커야 함)
+    eternal : 영속성 캐시 설정 (true 이면 timeToIdleSecond, timeToLiveSecnod 설정 무시됨) : false
+    timeToIdleSecond : 해당 초동안 캐시가 호출되지 않으면 삭제 : 0
+    timeToLiveSecond : 해당 초가 지나면 캐시 삭제 : 0
+    overflowToDisk : 오버플로우된 항목에 대해 disk에 저장할지 여부 : false
+    diskPersistent : 캐시를 disk에 저장하여, 서버 로드시 캐시를 말아둘지 설정 : false
+    diskExpiryThreadIntervalSeconds : Disk Expiry 스레드의 작업 수행 간격 설정 : 0
+    memoryStoreEvictionPolicy : 캐시의 객체수가 maxEntriesLocalHeap 에 도달하면 객체를 추가하고 제거하는 정책 설정
+        - LRU : 가장 오랫동안 호출되지 않은 캐시를 삭제
+        - LFU : 호출 빈도가 가장 적은 캐시를 삭제
+        - FIFO : First in First Out 캐시가 생성된 순서대로 가장 오래된 캐시를 삭제
+    -->
+
+    <!-- defaultCache : 기본 Cache 설정 -->
+    <defaultCache
+        maxElementsInMemory="300"
+        eternal="false"
+        timeToIdleSeconds="120"
+        timeToLiveSeconds="120"
+        overflowToDisk="false"
+        maxElementsOnDisk="10000000"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        memoryStoreEvictionPolicy="LRU">
+    </defaultCache>
+
+	<!-- cache for message -->
+    <cache name="sys.message.cache"
+		maxEntriesLocalHeap="300"
+        maxEntriesLocalDisk="500"
+        eternal="false"
+        timeToIdleSeconds="3600"
+        timeToLiveSeconds="600"
+		overflowToDisk="true"
+		diskPersistent="true"
+		diskExpiryThreadIntervalSeconds="120"
+        logging="true"
+        statistics="true"
+        memoryStoreEvictionPolicy="LRU">
+    </cache>
+
+    <!--
+    개별 사용을 위한 캐시 설정 (이름으로 호출)
+    사용예제 :
+        @Cacheable(value="localCache"),
+        @CacheEvict(value="localCache", allEntries=true)
+    <cache name="localCache"
+        maxEntriesLocalHeap="200"
+        maxEntriesLocalDisk="300"
+        eternal="false"
+        diskSpoolBufferSizeMB="20"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        memoryStoreEvictionPolicy="LRU"
+        transactionalMode="off"
+        statistics="true">
+        <persistence strategy="localTempSwap" />
+    </cache>
+    -->
+
+</ehcache>

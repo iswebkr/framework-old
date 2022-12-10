@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+    <definition name="template.default" id="template.default" template="/templates/default.jsp">
+        <put-attribute name="page.title" value="" />
+        <put-attribute name="page.body" value="" />
+    </definition>
+
+	<definition name="template.sample" id="template.sample" extends="template.default">
+		<put-attribute name="page.body" expression="/WEB-INF/jsp/${view}.jsp" />
+	</definition>
+
+	<!-- adminlte -->
+
+	<definition name="adminlte.default" id="adminlte.default" template="/templates/adminlte/default.jsp">
+    	<put-attribute name="page.title" value="" />
+    	<put-attribute name="page.body" value="" />
+    </definition>
+
+    <definition name="adminlte.sample" id="adminlte.sample" extends="adminlte.default">
+    	<put-attribute name="page.body" expression="/WEB-INF/jsp/${view}.jsp" />
+    </definition>
+
+</tiles-definitions>

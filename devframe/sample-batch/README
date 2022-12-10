@@ -1,0 +1,5 @@
+배치 실행시
+
+-Dspring.profiles.active=dev
+
+과 같이 profile 을 설정해 주어야 함

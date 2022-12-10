@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 30초마다 설정 파일의 변경 확인, 변경되면 다시 확인 -->
+<!-- <configuration scan="true" scanPeriod="30 seconds"> -->
+
+<included>
+
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+		<resetJUL>true</resetJUL>
+	</contextListener>
+
+	<!-- spring.profiles.active 에 따른 properties 파일 로딩 -->
+	<property resource="logback-${spring.profiles.active}.properties" />
+
+	<!-- log level -->
+	<property name="LOG_LEVEL" value="${log.level}" />
+
+	<!-- property value for logging -->
+	<property name="LOG_PATH" value="${log.config.path}" />
+	<property name="LOG_FILE_NAME" value="${log.config.filename}" />
+	<property name="ERR_LOG_FILE_NAME" value="${LOG_FILE_NAME}_error" />
+	<property name="SQL_LOG_FILE_NAME" value="${LOG_FILE_NAME}_sql" />
+
+	<!-- pattern for logging -->
+	<property name="PATTERN_DEFAULT" value="%-5level %d{yy-MM-dd HH:mm:ss}[%thread] [%logger{0}:%line] - %msg%n" />
+	<property name="PATTERN_CONSOLE_LOG" value="%cyan(%d{ISO8601}) %highlight(%-5level) [%(%t)] %yellow(%C{1.}): %msg%n%throwable" />
+	<property name="PATTERN_ROLLING_FILE" value="%d %p %C{1.} [%t] %m%n" />
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${PATTERN_CONSOLE_LOG}</pattern>
+		</encoder>
+    </appender>
+
+	<!-- FILE APPENDER -->
+    <appender name="APP_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    	<!-- 로그파일경로 -->
+        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
+        <!-- ROLLING 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 출력패턴 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${PATTERN_DEFAULT}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- ERROR FILE APPENDER -->
+    <appender name="ERROR_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    	<filter class="ch.qos.logback.classic.filter.LevelFilter">
+    		<level>error</level>
+    		<onMatch>ACCEPT</onMatch>
+    		<onMismatch>DENY</onMismatch>
+    	</filter>
+    	<!-- 로그파일경로 -->
+        <file>${LOG_PATH}/${ERR_LOG_FILE_NAME}.log</file>
+        <!-- ROLLING 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOG_PATH}/${ERR_LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 출력패턴 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${PATTERN_DEFAULT}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- FILE APPENDER -->
+    <appender name="SQL_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    	<!-- 로그파일경로 -->
+        <file>${LOG_PATH}/${SQL_LOG_FILE_NAME}.log</file>
+        <!-- ROLLING 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOG_PATH}/${SQL_LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 출력패턴 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${PATTERN_DEFAULT}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- LOG everything at INFO level -->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="APP_LOG_FILE" />
+        <appender-ref ref="ERROR_LOG_FILE" />
+        <appender-ref ref="SQL_LOG_FILE" />
+    </root>
+
+	<!-- jdbc & mybatis -->
+  	<logger name="jdbc.sqlonly" level="DEBUG" additivity="false">
+  		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="SQL_LOG_FILE" />
+  	</logger>
+	<logger name="jdbc.sqltiming" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="SQL_LOG_FILE" />
+	</logger>
+	<logger name="jdbc.resultsettable" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="SQL_LOG_FILE" />
+	</logger>
+	<logger name="com.ibatis" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE" />
+        <appender-ref ref="SQL_LOG_FILE" />
+	</logger>
+    <logger name="org.apache.ibatis.logging.jdbc" level="DEBUG" additivity="false">
+    	<appender-ref ref="CONSOLE" />
+        <appender-ref ref="SQL_LOG_FILE" />
+    </logger>
+    <logger name="org.mybatis" level="DEBUG" additivity="false">
+    	<appender-ref ref="CONSOLE" />
+        <appender-ref ref="SQL_LOG_FILE" />
+    </logger>
+    <logger name="org.springframework.transaction" level="DEBUG" additivity="false">
+    	<appender-ref ref="CONSOLE" />
+        <appender-ref ref="SQL_LOG_FILE" />
+    </logger>
+    <logger name="org.springframework.jdbc.datasource" level="DEBUG" additivity="false">
+    	<appender-ref ref="CONSOLE" />
+        <appender-ref ref="SQL_LOG_FILE" />
+    </logger>
+    <logger name="org.springframework.jndi" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="APP_LOG_FILE" />
+        <appender-ref ref="ERROR_LOG_FILE" />
+    </logger>
+    <logger name="org.apache.commons.digester.Digester" level="DEBUG" additivity="false">
+    	<appender-ref ref="CONSOLE" />
+        <appender-ref ref="APP_LOG_FILE" />
+    </logger>
+    <logger name="org.hibernate" level="INFO" additivity="false">
+    	<appender-ref ref="CONSOLE" />
+        <appender-ref ref="APP_LOG_FILE" />
+        <appender-ref ref="ERROR_LOG_FILE" />
+    </logger>
+    <logger name="org.apache.cxf.phase" level="INFO" additivity="false">
+    	<appender-ref ref="CONSOLE" />
+        <appender-ref ref="APP_LOG_FILE" />
+        <appender-ref ref="ERROR_LOG_FILE" />
+    </logger>
+
+</included>

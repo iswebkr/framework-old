@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.isweb.sample.web.city.mapper.CityMapper">
+
+	<sql id="sqlQuery">
+		select
+				*
+		from	city
+	</sql>
+
+	<sql id="sqlSearch">
+		<where>
+			<if test="id > 0">
+				and id = #{id}
+			</if>
+			<if test="@kr.isweb.cmmn.util.egov.EgovMybaitsUtil@isNotEmpty(name)">
+				and name = #{name}
+			</if>
+		</where>
+	</sql>
+
+	<select id="selectCityCount" parameterType="kr.isweb.sample.web.city.dto.CityParamDto" resultType="kr.isweb.sample.web.city.dto.CityResultDto">
+		select count(*) from (
+			<include refid="sqlQuery" />
+			<include refid="sqlSearch" />
+		) a
+	</select>
+
+	<select id="selectCityList" parameterType="kr.isweb.sample.web.city.dto.CityParamDto" resultType="kr.isweb.sample.web.city.dto.CityResultDto">
+		select * from (
+			<include refid="sqlQuery" />
+			<include refid="sqlSearch" />
+		) a
+		order by id desc
+		limit 0, 100
+	</select>
+
+	<select id="selecgPaginatedCityList" parameterType="kr.isweb.sample.web.city.dto.CityParamDto" resultType="kr.isweb.sample.web.city.dto.CityResultDto">
+		select
+				*
+		from (
+			<include refid="sqlQuery" />
+			<include refid="sqlSearch" />
+		) a
+	</select>
+
+	<select id="selectCity" parameterType="kr.isweb.sample.web.city.dto.CityParamDto" resultType="kr.isweb.sample.web.city.dto.CityResultDto">
+		select
+					*
+		from (
+			<include refid="sqlQuery" />
+			<include refid="sqlSearch" />
+		) a limit 0, 1
+	</select>
+
+	<insert id="insertCity" parameterType="kr.isweb.sample.web.city.dto.CityParamDto">
+	</insert>
+
+	<update id="updateCity" parameterType="kr.isweb.sample.web.city.dto.CityParamDto">
+	</update>
+
+	<delete id="deleteCity" parameterType="kr.isweb.sample.web.city.dto.CityParamDto">
+	</delete>
+
+
+</mapper>

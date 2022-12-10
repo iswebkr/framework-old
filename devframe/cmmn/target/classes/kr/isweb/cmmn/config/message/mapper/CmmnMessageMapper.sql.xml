@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.isweb.cmmn.config.message.mapper.CmmnMessageMapper">
+
+	<cache-ref namespace="sys.message.cache" />
+
+	<select id="getMessage" parameterType="Map" resultType="String">
+		select
+				msgText
+		from	tb_cmmn_msg
+		where	msgId = #{msgId}
+		and		msgLocale = #{msgLocale}
+	</select>
+</mapper>

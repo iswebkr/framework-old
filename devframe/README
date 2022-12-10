@@ -1,0 +1,420 @@
+■ 사용 전(중요)
+
+	* 패키지명이나 프로젝트명은 기관에 메타 시스템이 존재하는 경우 해당 메타 시스템의 표준 용어 및 단어를 사용
+	* 없는 경우 _reference 디렉토리의 "행정표준용어.xls" 파일을 참고하여 표준 용어 및 단어 사용
+	* 별도 표준이 존재한다면 해당 표준에 맞추어 프로젝트 작업 진행
+
+■ 프레임워크는 maven module 프로젝트 형태로 구성되어 있음
+
+	devframe (최상위 parent 프로젝트)
+		├─ cmmn (프레임워크 공통 및 기능 공통)
+		│  sample-biz (Sample 프로젝트 business logic - Controller, Service, Mapper ..등)
+		│  * cmmn 의 프레임워크 공통을 상속받아 필요한 개발환경 구축 가능
+		│  * cmmn 을 포함하고 있음
+		├─ sample-web (Sample 프로젝트 resource - html, jsp, image, css, javascript .. 등)
+		│  * sample-biz 의 front-end 처리를 위한 프로젝트
+		│  * sample-biz 를 포함하고 있음
+		│  * war 배포 대상 패키지
+		├─ sample-batch
+		│  * spring-batch 로 구성된 샘플 batch 프레임워크
+		└─ * cmmn 을 포함하고 있음
+
+	* devframe 의 pom.xml 에는 하위 모듈 프로젝트에 공통으로 필요한 plugin 및 build 등, maven 구성 등의 정보를 관리
+	* devframe 의 하위 모듈 프로젝트들도 각각의 pom.xml 을 가지고 있지만 devframe 의 pom.xml 에 선언된 라이브러리를 선언적으로 가져간다거나
+	  각각의 프로젝으테 대한 설명 및 간단한 설정 정도만 관리
+	* devframe 의 pom.xml 에 선언된 dependencyManagement, pluginManagement 에는 각각의 프로젝트에 필요한 라이브러리 및 plugin 등을 선언
+	* 하위 모듈 프로젝트에서는 별도의 버전 명시 필요 없이 dependencyManagement 나 pluginManagement 에 선언된 dependency 및 plugin 을 별도 선언하여 사용 가능
+	  - 프로젝트별로 필요한 라이브러리를 각각 dependency 선언으로 사용할 수 있음
+	* devframe 을 삭제하면 하위 모듈 프로젝트가 모두 삭제될 수 있으니 주의할 것
+
+■ SVN 최초 적용시 (이클립스 주의 사항)
+
+	* SVN 에 올려진 소스를 내려받은 후 각각의 module 프로젝트에서 마우스 오른쪽 버튼을 눌러 import as project 메뉴를 선택하여 사용가능한 형태의 프로젝트로 활성화 시켜야 함
+	* import as project 로 활성화되어진 프로젝트는 devframe 내부의 모듈 프로젝트와 동일한 프로젝트이며 수정 대상 프로젝트는 import ad project 로 활성화 되어진 프로젝트의 소스임
+	  만약 활성화되지 않은 부모프로젝트의 하위 모듈 프로젝트 소스를 수정하면 자동완성 기능 등이 작동하지 않음
+
+1. 새로운 프로젝트를 생성하고자 하는 경우 아래와 같은 규칙을 따른다.
+
+	참조 URL :
+	https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-servlet-context-hierarchy
+
+	Context Hierarchy 구조에 맞게 다음처럼 구성한다.
+
+	★ 구성하기전 먼저 자신의 프로젝트에 맞게 패키지 구조를 새로 만들고 해당 패키지별로 설정 파일을 복사하거나 수정/편집하여 위치 시킴
+
+	1.1. Root WebApplicationContext 생성
+		 - CmmnRootWebApplicationContext 를 상속받아 새로운 RootWebApplicationContext 를 추가하고 @Configuration 을 추가한다.
+		 - EgovFramework 를 사용하고자 하는 경우 생성한 RootWebApplicationContext 파일에 @EnableEgovFramework 를 추가한다.
+		 - @ComponentScan 대상 패키지를 선언하고 Controller 패키지를 스캔 대상에서 제외시킨다.
+
+	1.2. ServletWebApplicationContext 생성
+		 - CmmnServletWebApplicationContext 를 상속받아 새로운 ServletWebApplicationContext 를 추가한고 @Configuration 을 추가한다.
+		 - @ComponentScan 대상 패키지를 선언하고 Controller 패키지만 스캔이 가능하도록 선언한다.
+
+	1.3. Tiles 템플릿 프레임웍을 사용하고자 하는 경우
+		 - 생성된 ServletWebApplicationContext 에 @EnableTiles 를 추가한다.
+
+	1.4. web.xml 을 대체하는 Web Application Initializer 를 생성
+		 - CmmnAbstractDispatcherServletInitializer 를 상속받아 새로운 WebApplicationServletInitializer 를 추가한다.
+		 - getRootConfigClasses() 와 getServletConfigClasses() 를 override 하여 생성한 RootWebApplicationContext 와 ServletWebApplicationContext 를 각각 추가한다.
+
+	1.5. Database Handling 을 위해 CmmnMyBatisDataSource 를 상속받아 새로운 DataSource 를 추가
+		 - 해당 파일에 @Configuration 를 추가 하여 해당 설정이 사용 가능하도록 선언
+		 - MyBatis Mapper Scan 을 위한 @MapperScan 어노테이션을 추가
+
+2. spring profile 적용
+
+	개발환경과 운영환경에 따른 profile 을 달리 적용하여 각각의 환경에 맞는 설정정보를 읽어들임
+
+	2.1. 프레임워크에 별도 설정 없이 프로젝트 구동시 spring profile 은 "dev" 모드로 구동 되어짐
+		 - devframework/pom.xml 파일의 profiles 항목 참조
+
+	2.2. spring profile 은 아래 URL을 참조하여 환경에 맞게 적용하여 사용
+		 - 참조 URL : https://www.baeldung.com/spring-profiles
+		 - 대략 다음과 같음
+		 	* Bean 에 @Profile 을 추가하여 spring.profiles.active 설정에 맞는 bean 구동
+		 	  ex) @Profile("dev")
+		 	* WebApplicationInitializer 의 ServletContext 에 initParam 형태로 추가하는 방식
+		 	  ex) servletContext.setInitParameter("spring.profiles.active", "dev")
+		 	* ConfigurableEnvironment 에 추가하는 방식
+		 	  ex)
+		 	  @Autowired
+		 	  private ConfigurableEnvironment env;
+			  env.setActiveProfiles("dev");
+			* JVM System Parameter 로 추가하는 방식
+			  ex) -Dspring.profiles.active=dev
+			* Environment Variable (on Linux or Windows)
+			  ex) export spring_profiles_active=dev
+			* Maven Profile (현 프레임워크에 적용되어진 방식)
+			  2.2.1. maven 빌드시 spring.profiles.active 를 적용하려면 다음과 같은 순서로 적용
+			     2.2.1.1. pom.xml 에 profiles 설정 추가
+			     2.2.1.2. application.profiles 에 spring.profiles.active 를 다음과 같이 선언
+			         	  ex) spring.profiles.active=@spring.profiles.active@
+			     2.2.1.3. pom.xml 에 resource filtering 추가
+				  	  	  ex)
+							<build>
+							    <resources>
+							        <resource>
+							            <directory>src/main/resources</directory>
+							            <filtering>true</filtering>
+							        </resource>
+							    </resources>
+							    ...
+							</build>
+		 - 배치 및 jenkins 등에서는 JVM System Parameter 방식으로 적용 사용
+
+3. profiles 별 properties
+
+	spring.profiles.active 설정에 따라 각각의 환경에 맞는 properties 파일을 읽어들이도록 설정되어 있음
+	application.properties 에는 개발, 운영환경에 상관 없는 설정 정보를 추가하여 사용
+
+	3.1. 프레임워크 구동 시 CmmnApplicationContextInitializer 에 의해 application.properties 파일을 읽어들임
+	3.2. application.properties 파일에 정의된 spring.profiles.active 값에 해당하는 각각의 properties 를 읽어들이도록 CmmnRootWebApplicationContext 에 선언되어 있음
+	     code)
+	     @PropertySource(value = {
+			 	 "classpath:application-${spring.profiles.active}.properties"
+		 })
+	3.3. 각 profile 별 properties 에 개발환경과 운영환경에 맞는 설정정보를 지정하여 사용함
+
+	참고 URL : https://www.egovframe.go.kr/wiki/doku.php?id=egovframework:rte3:fdl:property_source
+
+4. logback 적용
+
+	로그 출력을 위한 logback 을 적용하고 원하는 패키지에 대한 로그를 로그레벨별, 출력방식별로 확인 가능함
+	추가할 프로젝트의 resource 에 logback.xml 을 생성 후 logback-default.xml 을 include 하여 기본 설정 정보를 사용할 수 있음
+
+	4.1. 프로젝트에 logback 을 적용하고자 하는경우 resource 에 logback.xml 을 생성하고 다음과 같이 logback-default.xml 을 include 하도록 선언
+		 ex)
+			<configuration status="DEBUG" scan="true" scanPeriod="15 seconds">
+				<!-- FrameWork System Logback Configuration -->
+				<include resource="logback-default.xml" />
+			</configuration>
+	4.2. logback 설정으로 생성되는 log 파일을 개발, 운영 환경에 서로 다르게 생성하고자 하는 경우
+		  - logback-dev.properties 와 logback-prod.properties 에 각각의 log 관련 설정을 변경 적용
+
+5. EgovFramework 적용 (현재 시점 EgovFramework Version : 3.10.0)
+
+	RootWebApplicationContext 에 @EanbleEgovFramework 를 추가함으로써 전자정부프레임워크를 적용할 수 있음
+
+	5.1. LeaveaTrace
+		 - Exception 이나 Exception 이 아닌 경우의 Trace 후처리 로직을 수행하고자 하는 경우 사용
+		   * 참조URL : https://www.egovframe.go.kr/wiki/doku.php?id=egovframework:rte:bsl:exception_handling
+
+	5.2. ExceptionHandlerService
+		 - CmmnEgovFrameConfigurer 의 ExceptionTransfer 설정에 따라 pattern 에 해당하는 패키지 내 메소드 실행시 발생한 익셉션에 대해 별도 처리 가능
+		   ex) 후처리 나 Error Log 를 Database 에 저장하고자 하는 경우 사용 가능
+
+6. Multiple DataSource
+
+	DBMS 핸들링을 위한 DataSource 를 다중 구성하여 각각의 환경에 맞게 DBMS 핸들링이 가능함
+
+	6.1. 프로젝트 생성 시 Multiple DataSource 구성을 위해  CmmnMyBatisDataSource 를 상속받아 새로운 DataSource 파일을 생성
+	6.2. Multiple DataSource 는 공통/아키 파트에서 추가하고 프로젝트별로 추가하지 않도록 함
+	6.3. jpa 관련 부팅시 자동으로 새로운 테이블을 생성하고자 하는 경우 프로젝트별 DataSource 파일에 추가
+	6.4. 각각의 DataSource 는 별도 트랜잭션 처리 임
+		 - 각각의 DataSource 는 별도 트랜잭션으로 처리되기 때문에 경우에 따라 보상트랜잭션 처리가 필요할 수 있음
+		 - DataSource의 Routing 기능을 사용하기 위한 Annotation 적용 기준은 Service 객체임 (XA DataSource 는 Mapper 기준)
+	6.5. 적용방법
+		 6.5.1. RoutingKey 에 사용하고자 하는 DataSource Keyword 추가
+		 6.3.2. CmmnDataSource 에 각각의 DataSource 추가
+		 6.3.3. CmmnMyBatisDataSource 에 추가한 DataSource Routing 설정을 추가
+		 		- default target datasource 를 선언하여 별도 선언이 없는 경우 기본적으로 사용할 DataSource 설정
+		 		- DataSource 는 Lazy 방식으로 사용할 수 있도록 추가
+		 6.3.4. Routing DataSource 사용을 위해 RoutingType, RoutingMethod 를 사용하여 Mapper 에 DataSource 를 Routing 하여 사용 가능
+
+7. XA DataSource 를 활용한 다중 트랜잭션 처리
+
+	Atomikos 를 활용한 JTA 분산 트랜잭션 적용 가능함
+
+	7.1. DBMS 벤더별 XA 설정
+	7.2. 분산 트랜잭션 처리는 각각의 DataSource 가 한개의 트랜잭션으로 동작함
+
+8. Message Source 설정
+
+	DBMS 기반의 Message Source 사용, 지정된 값이 없는 경우 각각의 locale 별 message.properties 에서 해당 메시지 정보 적용
+
+	8.1. 부팅 과 동시에 JPA 를 통해 Entity 기반 메시지 테이블이 추가되어짐
+	8.2. CmmnMessageEntity 에 선언된 Entity 를 기반으로 테이블 생성
+		 - 테이블을 수동으로 생성하는 경우 해당 EntityManagerFactory Bean 을 삭제하여 자동 생성 기능 비활성화
+		 - 테이블을 자동으로 생성하고자 하는 경우 Entity 객체를 변경 적용하여 환경에 맞는 메시지 테이블 자동 생성하여 사용 가능
+	8.3. 생성된 테이블의 메시지 정보를 조회하기 위한 Mapper 설정파일은 아래 파일 참조
+		 ex) CmmnMessageMapper, CmmnMessageMapper.sql.xml
+
+9. Error Handling
+
+	9.1. Error 처리를 Controller Advice (CmmnAnnotationExceptionHandler) 와 EgovFramework 의 ExceptionHandlerService 를 사용하는 방식 등 다양하게 처리 가능한 방식이 존재함
+	9.2. 404, 500 등 에러 처리도 가능한 형태로 구성되어져 있음
+	9.3. CmmnServiceExceptionAspect 를 통해 Service 객체에서 Exception 이 발생하는 경우 EgovFramework 의 exceptionTransfer 로 Exception 정보를 전달하여 처리 하도록 구성되어 있음
+	9.4. ControllerAdvice 는 2가지로 구성되어 있음
+		 - CmmnAnnotationExceptionHandler : 전자정부의 AbstractAnnotationExceptionHandler 구현한 Controller Advice (우선순위 : 2)
+		 - CmmnResponseEntityExceptionHandler : 에러 처리를 ResponseEntity 형태로 반환하는 Controller Advice (우선순위 :1)
+		 - 우선순위에 따라 Controller 에서 발생하는 에러는 1차 CmmnResponseEntityExceptionHandler 가 처리하고 CmmnResponseEntityExceptionHandler 에서 처리가 되지 않는 에러는
+		   CmmnAnnotationExceptionHandler 에서 처리되는 형태
+
+10. Spring Security
+
+	SpringSecurity 를 적용하여 보안 설정을 간소화 시킬 수 있음
+
+	10.1. SpringSecurity 를 적용하기 위해 CmmnWebSecurityConfigurer 를 상속받아 새로운 SpringSecurityConfigurer 를 추가
+	10.2. @EnableWebSecurity Annotation 을 추가하여 해당 설정을 활성화
+	10.3. 상속받은 CmmnWebSecurityConfigurer 의 각각의 설정을 overide 하여 재정의 하여 사용
+	     - 별도 설정을 하지 않는 경우 CmmnWebSecurityConfigurer 의 설정을 기본으로 함
+	10.4. 회원 인증절차를 처리하기 위한 CmmnMemberAuthenticationProvider 이 준비되어 있어 해당 Provider 를 통해 인증 과정 처리 가능
+		 ex) DBMS 기반 회원인증 등
+
+11. CXF Web Services
+
+	SOAP 메시지 처리를 위한 Apache CXF 웹서비스 사용 가능
+
+	11.1. Apache CXF Web Service Configuration 파일을 추가하고 @Configuration 과 @EnableApacheCXF 를 추가
+	11.2. 웹서비스 생성 순서
+		 11.2.1. 웹서비스를 제공하고자 하는 Service Interface 와 구현체를 생성
+		 		- Interface 객체에는 @WebService 를 선언
+		 		- 구현 객체에는 @WebService(endpointInterface = "kr......CmmnCxfWebServiceSample") 와 같은 형태의 Annotation 을 선언
+		 		- 필요에 따라 @WebMethod 및 @WebParam 등의 Annotation 을 선언하여 사용
+		 11.2.2. 해당 서비스 End Point 선언
+		 	    ex)
+		 	    	@Bean
+					public Endpoint cityWebServiceEndPoint(SpringBus cxf) {
+						Endpoint endpoint = new EndpointImpl(cxf, new CityWebServiceImpl());
+						endpoint.publish("/cityWebservice");
+						return endpoint;
+					}
+		 11.2.3. http://localhost/cxf-webservices 에 추가된 서비스가 보이는지 확인
+
+12. WebSocket 설정
+
+	클라이언트와 메시지를 주고 받기 위한 WebSocket 설정
+	프레임워크에는 Stomp 를 사용한 웹소켓 설정 방식으로 되어 있음
+
+	12.1. 웹소켓을 활성화 시키기 위해 이미 구현되어져 있는 CmmnWebSocketConfigurer 를 상속받아 새로운 WebSocketConfigurer 파일을 생성한다.
+	12.2. endpoint 나 message broker 를 override 하여 재구성하지 않으면 기본적으로 CmmnWebSocketConfigurer 에 구성된 웹소켓 정보를 기반으로 작동한다.
+
+13. H2 Memory DataBase
+
+	session 관리를 jdbc 기반으로 하고자 적용하였으나 현재는 h2-console 만 사용중
+
+	13.1. CmmnAbstractDispatcherServletInitializer 의 registerDispatcherServlet 메소드에 h2-console 관련 Servlet 추가되어 있음
+	13.2. CmmnWebSecurityConfigurer 에 Security 보안 관련 적용을 무시하도록 설정하여 사용
+	13.3. 프로젝트 구동 후 http://localhost/h2-console 로 접근하면 웹에서 간단한 DBMS 핸들링이 가능한 h2-console 화면을 볼 수 있음
+
+14. 넥사크로
+
+	실무에서 사용하는 넥사크로 설정 정보를 추가하여 별도 설정 없이 사용 가능
+
+	14.1 넥사크로 설정 적용 방법
+		 12.1.1. 넥사크로 설정을 위한 Configuration 파일을 생성
+		 12.1.2. 생성된 Configuration 파일의 상단에 @Configuration, @EnableNexacro Annotation을 선언
+
+15. Cache (EhCache)
+
+	Service 및 Query 를 위한 EhCache 사용 가능
+
+16. Validation (Bean Validation JSR-303, JSR-380 지원)
+
+	Bean Validation 관련 기능은 아래 전자정부프레임워크의 URL 을 참조
+
+	참조(Bean Validation) : https://www.egovframe.go.kr/wiki/doku.php?id=egovframework:rte2:ptl:jsr303
+
+	JSR-303 : https://beanvalidation.org/1.0/spec/
+	JSR-380 : https://beanvalidation.org/2.0-jsr380/spec/
+
+	16.1. Custom Validation 을 만들어 적용하려면 다음과 같은 순서로 가능
+		  16.1.1. kr.isweb.cmmn.config.validate.annotation 에 원하는 Validation Annotation 을 추가
+		  16.1.2. kr.isweb.cmmn.config.validate.constraint 에 Validation 체크를 위한 Constraint 를 추가
+		  16.1.3. Validation 을 체크하고자 하는 FIELD 및 Method 에 해당 Validation 을 적용
+		  16.1.4. 전자정부 Bean Validation 을 참조하여 Validation 체크 로직 구현
+	16.2. 현재 만들어져 있는 사용자 정의 Validation 용 Annotation 은 아래와 같음
+		  - @ValidBizNumber : 사업자등록번호 체크
+		  - @ValidCorpNumber : 법인번호 체크
+		  - @ValidJuminNumber : 주민등록번호 체크
+		  - @ValidFgnrNumber : 외국인등록번호 체크
+		  - @ValidMobilePhone : 핸드폰 번호 체크
+	16.3. Bean Validation Exception 이 발생할 경우 BindException 으로 캐치할 수 있음
+		  - @ControllerAdvice 를 통해 해당 BindException 을 캐치하여 처리할 수 있음
+		  - 현재 프레임워크에는 두가지 ControllerAdvice 가 존재함
+		  	* CmmnAnnotationExceptionHandler : ExceptionHandler 별 처리를 위한 ControllerAdvice (전자정부의 AbstractAnnotationExceptionHandler 를 상속받아 구현) (우선순위 : 2)
+		  	* CmmnResponseEntityExceptionHandler : ResponseEntity Exception 처리를 위한 ControllerAdvice (우선순위 : 1)
+		  - Controller 의 Method Parameter 에 BindingResult 가 선언된 경우 ControllerAdvice 에서 캐치할 수 없기 때문에 Controller Method 내부에서 hasError() 또는 hasErrors() 를
+		    통한 에러 여부를 확인하여 처리하는 로직이 필요함
+
+		    ex) 1. @ControllerAdvice 에서 캐치 가능한 방식
+
+		    @PostMapping
+			public ResponseEntity<String> sampleDo(@Valid SampleDto sampleDto, Model model) {
+				return ResponseEntity.ok("success");
+			}
+
+			ex) 2. BindingResult 의 조건절 처리
+
+			@PostMapping
+			public ResponseEntity<String> sampleDo(@Valid SampleDto sampleDto, BindingResult result, Model model) {
+				if(result.hasError()) {
+					// error 처리
+				} else {
+					return ResponseEntity.ok("success");
+				}
+			}
+
+17. Egov Utilities
+
+	17.1. 전자정부에서 제공하는 유틸리티를 옮겨 놓음
+		  - kr.isweb.cmmn.util.egov 패키지 참조
+
+18. DevFrame Utilities
+
+	18.1. CmmnExcelUtil : Excel Import, Excel Export 를 위한 유틸리티
+	18.2. CmmnFileUploadUtil : 파일 업로드를 위한 유틸리티 (CmmnImageUtil 의 썸네일, 워터마크 기능 사용)
+	18.3. CmmnImageUtil : 썸네일, 워터마크(텍스트, 이미지) 등 처리를 위한 유틸리티
+
+	ex) CmmnFileUploadUtil 사용하여 업로드(단일, 다중) 예제
+
+		- <HTML>
+		<spform:form method="post" enctype="multipart/form-data">
+			<input type="file" name="files" id="files01" />
+			<input type="file" name="files" id="files02" />
+		</spform:form>
+
+		- <JAVA>
+		@Override
+		public int updateCustomer(@RequestParam("files") MultipartFile [] files, Model model) throws Exception {
+			CmmnFileUploadUtil uploadUtil = new CmmnFileUploadUtil();
+
+			// list 형태로 업로드 정보를 리턴
+			uploadUtil.attempUpload("/test", files).getJsonResultObject().getJsonResultList();
+
+			// String (json 문자열) 형태로 업로드 정보를 리턴
+			uploadUtil.attempUpload("/test", files).getJsonResultObject().getJsonResultStr();
+		}
+
+	ex) Image 파일 업로드 시 watermark 를 적용하여 업로드 하고자 하는 경우
+
+		@Override
+		public int updateCustomer(@RequestParam("files") MultipartFile [] files, Model model) throws Exception {
+			CmmnFileUploadUtil uploadUtil = new CmmnFileUploadUtil();
+
+			// 이미지에 워터마크 텍스트를 출력하고자 하는 경우
+			uploadUtil.setWatermarkText("테스트");
+
+			// 이미지에 워터마크 이미지를 출력하고자 하는 경우
+			uploadUtil.setWatermarkImage(new File("test.png"));
+
+			// list 형태로 업로드 정보를 리턴
+			uploadUtil.attempUpload("/test", files).getJsonResultObject().getJsonResultList();
+
+			// String (json 문자열) 형태로 업로드 정보를 리턴
+			uploadUtil.attempUpload("/test", files).getJsonResultObject().getJsonResultStr();
+		}
+
+19. XSS Filter (Cross-Site Script 방지)
+
+	Cross Site Script 를 방지하기 위해 Lucy-XSS 라이브러리 적용
+
+	URL 참조 :
+	* https://naver.github.io/lucy-xss-filter/kr/
+	* https://github.com/naver/lucy-xss-servlet-filter
+
+	19.1 XSS를 방지하기 위하여 luxy-xss 라이브러리를 RequestWrapper 에 적용하여 Parameter 나 Parameter value 또는 Header
+		 를 통해 전달되는 데이터의 XSS 문자열을 변환하여 전송하도록 처리되어 있음
+	19.2. CmmnAbstractDispatcherServletInitializer 의 getServletFilters() 메소드에 XSSFilter 를 적용
+	19.3. CmmnXSSFilter, CmmnXSSRequestWrapper, CmmnXSSUtils 에 해당 로직 구현
+	19.4. Luxy-XSS 에서 제공하는 XSSFilter 기능 중 성능을 고려해 SAX 방식으로 처리하도록 구현되어 있음
+	      - whltelist 는 Luxy-XSS 라이브러리 내부에 있는 기본 SAX 설정 파일 사용
+	19.5. XSS Filter 및 XSS SAX Filter 설정은 resources 디렉토리의 lucy-xss*.xml 파일을 수정하여 적용 가능함
+
+
+20. JWT
+
+	JWT 를 사용한 인증 방식 지원
+
+	JWT 를 사용하기 위해서는 아래의 순서로 진행
+
+	1. CmmnJwtRequestFilter 를 상속받아 UserDetails 를 반환하는 getUserDetails() 메소드를 구현
+	   - 해당 메소드에서는 UserDetailsService 인터페이스를 구현하고 있는 CmmnUserDetailsServiceImpl 를 통해 사용자 정보를 조회하도록 처리
+	   - CmmnUserDetailsServiceImpl 의 구현체 에서는 loadUserByUsername 메소드를 구현하여야 함
+	     * 이때 사용자 정보를 Database 등에서 조회 후 사용자 정보가 없는 경우 UsernameNotFoundException 을 반환하도록 구현해야 함
+	2.  CmmnJwtRequestFilter 의 실제 구현체가 만들어 지고 나면 SpringSecurity 설정을 다음과 같은 형태로 처리
+
+		@EnableWebSecurity
+		public class SampleWebSecurityConfigurer extends CmmnWebSecurityConfigurer {
+
+			@Autowired
+			CmmnJwtAuthenticationEntryPoint cmmnJwtAuthenticationEntryPoint;
+
+			@Autowired
+			CmmnJwtAccessDeniedHandler cmmnJwtAccessDeniedHandler;
+
+			@Autowired
+			SampleJwtRequestFilter sampleJwtRequestFilter;
+
+			@Override
+			protected void configure(HttpSecurity http) throws Exception {
+				http.cors().and().csrf().disable();
+				http.authorizeRequests()
+					.antMatchers("/", "/websocket/**", "/user/**").permitAll()
+					.anyRequest().authenticated();
+				http.sessionManagement()
+					.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				http.exceptionHandling()
+					.accessDeniedHandler(cmmnJwtAccessDeniedHandler)
+					.authenticationEntryPoint(cmmnJwtAuthenticationEntryPoint);
+				http.addFilterBefore(sampleJwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+			}
+		}
+
+		* CmmnJwtRequestFilter 의 구현체인 sampleJwtRequestFilter 를 Filter 로 등록
+
+	3. JWT Token 발급 받기
+
+		-  CmmnJwtToken jwtToken = cmmnJwtTokenProvider.makeToken("iswebkr@gmail.com");
+
+		* 로그인 사용자의 아이디로 토큰을 발급받기 위해 위와 같은 형태로 처리
+		* jwtToken 객체에는 인증처리를 위한 access_token 과 access_token 재발급을 위한 refresh_token 정보가 넘어옴
+
+	4. application.properties 에 아래 항목은 각각의 환경에 맞게 수정
+
+		- jwt.access.token.secret : access_token 발급을 위한 secret_key
+		- jwt.refresh.token.secret : refresh_token 발급을 위한 secret_key
+		- jwt.refresh.token.url : refresh_token 발급을 위한 url
+		- jwt.grant.type : grant type 기본 (Bearer)
+

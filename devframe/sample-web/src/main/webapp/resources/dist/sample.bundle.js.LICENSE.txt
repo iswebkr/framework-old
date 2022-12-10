@@ -1,0 +1,29 @@
+/*! ../css/sample.css */
+
+/*! ./app.common */
+
+/*! @fortawesome/fontawesome-free/js/all */
+
+/*! admin-lte */
+
+/*! admin-lte/dist/css/adminlte.min.css */
+
+/*! bootstrap */
+
+/*! bootstrap/dist/css/bootstrap.min.css */
+
+/*! jquery */
+
+/*! jquery-pjax */
+
+/*!****************************!*\
+  !*** ./src/css/sample.css ***!
+  \****************************/
+
+/*!****************************!*\
+  !*** ./src/js/app.main.js ***!
+  \****************************/
+
+/*!******************************!*\
+  !*** ./src/js/app.common.js ***!
+  \******************************/
